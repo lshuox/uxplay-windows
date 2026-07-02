@@ -127,6 +127,12 @@ jobs:
       - name: where are we?
         run: pwd; ls
 
+      - name: upload release artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: uxplay-windows
+          path: release/**
+
       - name: cache dotnet tools (wix)
         uses: actions/cache@v5
         with:
@@ -148,6 +154,8 @@ jobs:
         run: |
           $env:PATH += ";$env:USERPROFILE\.dotnet\tools"
 
+          cp docs\LICENSE.rtf LICENSE.rtf
+
           wix extension add WixToolset.UI.wixext -acceptEula wix7
 
           wix build -acceptEula wix7 product.wxs `
@@ -160,9 +168,3 @@ jobs:
         with:
           name: uxplay-windows-msi
           path: uxplaywindows-installer.msi
-
-      - name: uploading artifact
-        uses: actions/upload-artifact@v5
-        with:
-          name: uxplay-windows
-          path: release/**
