@@ -49,7 +49,12 @@ jobs:
           cp -v ../mdnsresponder-patches/2881.patch .
           git apply -v 2881.patch
 
-          $msbuild = & 'C:\Program Files\Microsoft Visual Studio\Installer\vswhere.exe' -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
+          $vswhere = (Get-Command vswhere -ErrorAction SilentlyContinue).Source
+          if (-not $vswhere) { $vswhere = (Get-ChildItem -Path "C:\Program Files*\Microsoft Visual Studio\Installer" -Recurse -Filter vswhere.exe -ErrorAction SilentlyContinue | Select-Object -First 1).FullName }
+          if (-not $vswhere) { throw "vswhere not found" }
+          Write-Host "Using vswhere: $vswhere"
+
+          $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
           if (-not $msbuild) { throw "MSBuild not found" }
           Write-Host "Using MSBuild: $msbuild"
 
